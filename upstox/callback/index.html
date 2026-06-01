@@ -18,6 +18,7 @@
     label { display: block; margin-top: 20px; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
     textarea, input { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 12px; font: 15px Consolas, "Courier New", monospace; color: var(--ink); background: #ffffff; }
     textarea { min-height: 82px; resize: vertical; }
+    #command { min-height: 124px; }
     button { margin-top: 12px; border: 0; border-radius: 6px; background: var(--accent); color: #ffffff; font-weight: 700; padding: 11px 16px; cursor: pointer; }
     p { color: var(--muted); line-height: 1.5; }
     code { background: #eef3f8; border: 1px solid var(--line); border-radius: 4px; padding: 2px 5px; }
@@ -38,18 +39,22 @@
       <textarea id="command" readonly></textarea>
       <button id="copyCommand" type="button">Copy Command</button>
 
-      <p>This page is static and does not store your token or code. It only reads the <code>code</code> value from the URL so you can exchange it inside TAG.</p>
+      <p>This page is static and does not store your token or code. It only reads the <code>code</code> and <code>state</code> values from the URL so you can exchange it inside TAG.</p>
     </section>
   </main>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code") || "";
-    const error = params.get("error") || "";
+    const error = params.get("error") || params.get("error_description") || "";
     const state = params.get("state") || "";
     const account = state.toLowerCase().includes("secondary") ? "secondary" : "primary";
-    const py = '& "C:\\Users\\dell\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe"';
-    const command = `${py} -m src.tag_indian_market.upstox_auth --account ${account} --exchange-code ${code || "CODE_FROM_URL"} --save-token --web-redirect-uri ${window.location.origin}${window.location.pathname}`;
+    const root = 'C:\\Users\\dell\\Documents\\TAG - Indian Market';
+    const py = 'C:\\Users\\dell\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe';
+    const redirect = `${window.location.origin}${window.location.pathname}`;
+    const safeCode = code || "CODE_FROM_URL";
+    const command = `cd "${root}"
+& "${py}" -m src.tag_indian_market.upstox_auth --account ${account} --exchange-code "${safeCode}" --web-redirect-uri "${redirect}" --save-token`;
 
     document.getElementById("stamp").textContent = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST";
     const status = document.getElementById("status");
@@ -60,7 +65,7 @@
       status.textContent = `Authorization failed: ${error}`;
       status.classList.add("error");
     } else if (code) {
-      status.textContent = `Authorization code captured for ${account}. Copy it now and exchange inside TAG.`;
+      status.textContent = `Authorization code captured for ${account}. Copy the command and run it in TAG.`;
       status.classList.add("ok");
     } else {
       status.textContent = "No authorization code found. Open this page only through the Upstox login redirect.";
