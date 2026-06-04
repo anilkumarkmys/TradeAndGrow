@@ -32,14 +32,13 @@
   </div>
 
   <div class="card">
-    <b>Next step — exchange the code</b>
+    <b>Next step — finish login from GitHub (no laptop needed)</b>
     <ol>
-      <li>Open the GitHub <b>TAG Indian Market Scheduler</b> workflow → Run workflow → choose
-        <code>auth_request_primary</code> or <code>auth_request_secondary</code> and paste the code, <i>or</i></li>
-      <li>On your machine run:<br>
-        <code>python -m src.tag_indian_market.upstox_auth --account &lt;primary|secondary&gt; --exchange-code &lt;CODE&gt; --save-token --sync-github-secret</code></li>
+      <li>Open GitHub → <b>Actions</b> → <b>TAG Indian Market Scheduler</b> → <b>Run workflow</b>.</li>
+      <li>Set <b>job = <code>auth_exchange</code></b>, <b>account = <code id="acct2">primary</code></b>, and paste the <b>code</b> above into <b>code</b>.</li>
+      <li>Run it. TAG exchanges the code, syncs the GitHub access-token secret, validates live readiness, and posts <b>VALID / BLOCKED</b> to your Telegram.</li>
     </ol>
-    <div class="muted" style="font-size:12px">TAG saves the token, syncs the GitHub secret, validates it, and posts VALID/INVALID to your Telegram.</div>
+    <div class="muted" style="font-size:12px">No public server or laptop login required. (Secret sync needs a GH_PAT repo secret with secrets:write.)</div>
   </div>
 </div>
 <script>
@@ -52,6 +51,7 @@
     // state looks like TAGIM-<account>-<timestamp>
     var acct = (state.split("-")[1] || "primary");
     document.getElementById("acct").textContent = acct;
+    var acct2 = document.getElementById("acct2"); if (acct2) { acct2.textContent = acct; }
     if (err) { status.className = "bad"; status.textContent = "Upstox returned an error: " + err; return; }
     if (!code) { status.className = "bad"; status.textContent = "No authorization code found in the URL."; return; }
     status.className = "ok"; status.textContent = "Authorization code received. Copy it and exchange it (steps below).";
